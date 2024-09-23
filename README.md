@@ -21,7 +21,7 @@ Pruebas de API realizadas con Postman.
     "password": "password"
   }
   ```
-Respuestas:
+Respuestas:<br>
 201 Created: Usuario creado correctamente.<br>
 400 Bad Request: El DPI ya está registrado.
 
@@ -29,7 +29,7 @@ Respuestas:
 - **URL**: `/users`
 - **Método**: `GET`
 
-Respuestas:
+Respuestas:<br>
 200 OK: Devuelve un arreglo de usuarios.
 
 Ejemplo de respuesta:
@@ -55,7 +55,7 @@ Ejemplo de respuesta:
     "password": "password2"
 }
 ```
-Respuestas:
+Respuestas:<br>
 200 OK: Usuario actualizado correctamente. <br>
 400 Bad Request: El nuevo DPI ya está registrado.<br>
 404 Not Found: Usuario no encontrado.
@@ -64,6 +64,6 @@ Respuestas:
 - **URL**: `/users/:dpi`
 - **Método**: `DELETE`
 
-Respuestas:
+Respuestas:<br>
 204 No Content: Usuario eliminado correctamente.<br>
 404 Not Found: Usuario no encontrado.
