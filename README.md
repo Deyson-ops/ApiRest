@@ -3,7 +3,7 @@
 Esta es una API RESTful para gestionar usuarios, desarrollada con Node.js y Express.
 
 La API está desplegada en Render y puedes acceder a ella mediante la siguiente URL:<br>
-https://apirest-0x76.onrender.com
+https://apirest-7mr1.onrender.com
 
 ## Endpoints
 Pruebas de API realizadas con Postman.
