@@ -6,6 +6,7 @@ La API está desplegada en Render y puedes acceder a ella mediante la siguiente 
 https://apirest-0x76.onrender.com
 
 ## Endpoints
+Pruebas de API realizadas con Postman.
 
 ### Crear un usuario
 
@@ -21,7 +22,7 @@ https://apirest-0x76.onrender.com
   }
   ```
 Respuestas:
-201 Created: Usuario creado correctamente.
+201 Created: Usuario creado correctamente.<br>
 400 Bad Request: El DPI ya está registrado.
 
 ### Listar usuarios
@@ -55,8 +56,8 @@ Ejemplo de respuesta:
 }
 ```
 Respuestas:
-200 OK: Usuario actualizado correctamente.
-400 Bad Request: El nuevo DPI ya está registrado.
+200 OK: Usuario actualizado correctamente. <br>
+400 Bad Request: El nuevo DPI ya está registrado.<br>
 404 Not Found: Usuario no encontrado.
 
 ### Eliminar un usuario
@@ -64,5 +65,5 @@ Respuestas:
 - **Método**: `DELETE`
 
 Respuestas:
-204 No Content: Usuario eliminado correctamente.
+204 No Content: Usuario eliminado correctamente.<br>
 404 Not Found: Usuario no encontrado.
