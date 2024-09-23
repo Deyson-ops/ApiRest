@@ -24,7 +24,7 @@ Respuestas:
 201 Created: Usuario creado correctamente.
 400 Bad Request: El DPI ya está registrado.
 
-###Listar usuarios
+### Listar usuarios
 - **URL**: `/users`
 - **Método**: `GET`
 
@@ -43,7 +43,7 @@ Ejemplo de respuesta:
   ...
 ]
 ```
-###Actualizar un usuario
+### Actualizar un usuario
 - **URL**: `/users/:dpi`
 - **Método**: `PUT`
 - **Cuerpo de la solicitud**:
@@ -59,7 +59,7 @@ Respuestas:
 400 Bad Request: El nuevo DPI ya está registrado.
 404 Not Found: Usuario no encontrado.
 
-Eliminar un usuario
+### Eliminar un usuario
 - **URL**: `/users/:dpi`
 - **Método**: `DELETE`
 
