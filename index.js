@@ -57,7 +57,9 @@ app.post('/login', (req, res) => {
 
   // Generar el token JWT
   const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '30s' });
-  res.json({ token });
+
+  // Responder con un mensaje de bienvenida y el token
+  res.json({ message: `Bienvenido ${user.name}`, token });
 });
 
 // Endpoint para actualizar un usuario
@@ -89,8 +91,11 @@ app.delete('/users/:dpi', authenticateToken, (req, res) => {
     return res.status(404).json({ message: 'Usuario no encontrado' });
   }
 
+  // Eliminar el usuario del arreglo
   users.splice(userIndex, 1);
-  res.status(204).send();
+
+  // Responder con un mensaje de éxito
+  res.status(200).json({ message: `Usuario con DPI ${dpi} eliminado exitosamente` });
 });
 
 const PORT = process.env.PORT || 3000;  // Usará el puerto de Render o el 3000 localmente
