@@ -29,7 +29,7 @@ Dentro del directorio raíz del proyecto, crea un archivo llamado `.env` con las
 
 ```
 JWT_SECRET=#ConejoV3loz.1
-JWT_EXPIRATION=30s
+JWT_EXPIRATION=90s
 PORT=3000
 ```
 
@@ -45,11 +45,32 @@ npm start
 http://localhost:3000
 ```
 
-## Endpoints
+## Endpoints (pruebas realizadas con Postman)
 
-### 1. **Login**
+### 1. **Crear un Usuario**
 
-Genera un token JWT válido por 30 segundos.
+Crea un nuevo usuario.
+
+- **URL**: `/users`
+- **Método**: `POST`
+- **Cuerpo de la solicitud**:
+  ```json
+  {
+    "dpi": "123456789",
+    "name": "Deyson Donado",
+    "email": "dey@gmail.com",
+    "password": "password"
+  }
+  ```
+- **Respuestas**:
+  - `201 Created`: Usuario creado correctamente.
+  - `400 Bad Request`: El DPI o email ya está registrado.
+
+---
+
+### 2. **Login**
+
+Genera un token JWT válido por 90 segundos.
 
 - **URL**: `/login`
 - **Método**: `POST`
@@ -69,7 +90,7 @@ Genera un token JWT válido por 30 segundos.
 
 ---
 
-### 2. **Listar Usuarios** (Protegido por JWT)
+### 3. **Listar Usuarios** (Protegido por JWT)
 
 Obtiene una lista de todos los usuarios registrados.
 
@@ -89,27 +110,6 @@ Obtiene una lista de todos los usuarios registrados.
     ...
   ]
   ```
-
----
-
-### 3. **Crear un Usuario**
-
-Crea un nuevo usuario.
-
-- **URL**: `/users`
-- **Método**: `POST`
-- **Cuerpo de la solicitud**:
-  ```json
-  {
-    "dpi": "123456789",
-    "name": "Deyson Donado",
-    "email": "dey@gmail.com",
-    "password": "password"
-  }
-  ```
-- **Respuestas**:
-  - `201 Created`: Usuario creado correctamente.
-  - `400 Bad Request`: El DPI o email ya está registrado.
 
 ---
 
