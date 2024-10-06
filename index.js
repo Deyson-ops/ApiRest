@@ -1,76 +1,93 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
-
-dotenv.config();
-
+const jwt = require('jsonwebtoken'); // Importar JWT
+require('dotenv').config(); // Cargar variables de entorno
 const app = express();
 app.use(express.json());
 
-// Simulación de usuarios
-const users = [
-  { id: 1, email: 'user1@example.com', password: 'password1' },
-  { id: 2, email: 'user2@example.com', password: 'password2' },
-];
+const users = []; // Almacenará los usuarios
 
-// Middleware para proteger rutas con JWT
-const authenticateToken = (req, res, next) => {
-  const token = req.headers['authorization'];
+// Endpoint para crear un usuario
+app.post('/users', (req, res) => {
+  const { dpi, name, email, password } = req.body;
 
-  if (!token) return res.sendStatus(401);
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-};
-
-// Endpoint de login
-app.post('/login', (req, res) => {
-  const { email, password } = req.body;
-
-  const user = users.find(u => u.email === email && u.password === password);
-
-  if (!user) {
-    return res.status(403).json({ message: 'Credenciales inválidas' });
+  // Validar que el DPI no exista
+  const userExists = users.some(user => user.dpi === dpi);
+  if (userExists) {
+    return res.status(400).json({ message: 'El DPI ya está registrado' });
   }
 
-  const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION });
-
-  res.json({ token });
+  const newUser = { dpi, name, email, password };
+  users.push(newUser);
+  res.status(201).json(newUser);
 });
 
-// Rutas protegidas
+// Endpoint para listar todos los usuarios (Protegido por JWT)
 app.get('/users', authenticateToken, (req, res) => {
   res.json(users);
 });
 
-app.put('/users/:id', authenticateToken, (req, res) => {
-  const { id } = req.params;
-  const userIndex = users.findIndex(u => u.id == id);
+// Middleware para autenticar el token JWT
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Obtener el token del header
 
+  if (!token) return res.sendStatus(401); // No hay token, respuesta 401
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403); // Token inválido, respuesta 403
+    req.user = user;
+    next(); // Continuar con el siguiente middleware o endpoint
+  });
+}
+
+// Endpoint para iniciar sesión y generar un token JWT
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+  const user = users.find(u => u.email === email && u.password === password);
+
+  if (!user) {
+    return res.status(401).json({ message: 'Credenciales inválidas' });
+  }
+
+  // Generar el token JWT
+  const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '30s' });
+  res.json({ token });
+});
+
+// Endpoint para actualizar un usuario
+app.put('/users/:dpi', authenticateToken, (req, res) => {
+  const { dpi } = req.params;
+  const { name, email, password, newDpi } = req.body;
+
+  const userIndex = users.findIndex(user => user.dpi === dpi);
   if (userIndex === -1) {
     return res.status(404).json({ message: 'Usuario no encontrado' });
   }
 
-  users[userIndex] = { ...users[userIndex], ...req.body };
+  // Validar que el nuevo DPI no esté ya en uso si se va a cambiar
+  if (newDpi && users.some(user => user.dpi === newDpi)) {
+    return res.status(400).json({ message: 'El nuevo DPI ya está registrado' });
+  }
+
+  // Actualizar datos
+  users[userIndex] = { ...users[userIndex], name, email, password, dpi: newDpi || dpi };
   res.json(users[userIndex]);
 });
 
-app.delete('/users/:id', authenticateToken, (req, res) => {
-  const { id } = req.params;
-  const userIndex = users.findIndex(u => u.id == id);
+// Endpoint para eliminar un usuario
+app.delete('/users/:dpi', authenticateToken, (req, res) => {
+  const { dpi } = req.params;
 
+  const userIndex = users.findIndex(user => user.dpi === dpi);
   if (userIndex === -1) {
     return res.status(404).json({ message: 'Usuario no encontrado' });
   }
 
   users.splice(userIndex, 1);
-  res.json({ message: 'Usuario eliminado' });
+  res.status(204).send();
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;  // Usará el puerto de Render o el 3000 localmente
 app.listen(PORT, () => {
-  console.log(`Servidor escuchando en el puerto ${PORT}`);
+  console.log(`API escuchando en el puerto ${PORT}`);
 });
