@@ -1,63 +1,76 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
 const app = express();
 app.use(express.json());
 
-const users = []; // Almacenará los usuarios
+// Simulación de usuarios
+const users = [
+  { id: 1, email: 'user1@example.com', password: 'password1' },
+  { id: 2, email: 'user2@example.com', password: 'password2' },
+];
 
-// Endpoint para crear un usuario
-app.post('/users', (req, res) => {
-  const { dpi, name, email, password } = req.body;
+// Middleware para proteger rutas con JWT
+const authenticateToken = (req, res, next) => {
+  const token = req.headers['authorization'];
 
-  // Validar que el DPI no exista
-  const userExists = users.some(user => user.dpi === dpi);
-  if (userExists) {
-    return res.status(400).json({ message: 'El DPI ya está registrado' });
+  if (!token) return res.sendStatus(401);
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+};
+
+// Endpoint de login
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+
+  const user = users.find(u => u.email === email && u.password === password);
+
+  if (!user) {
+    return res.status(403).json({ message: 'Credenciales inválidas' });
   }
 
-  const newUser = { dpi, name, email, password };
-  users.push(newUser);
-  res.status(201).json(newUser);
+  const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION });
+
+  res.json({ token });
 });
 
-// Endpoint para listar todos los usuarios
-app.get('/users', (req, res) => {
+// Rutas protegidas
+app.get('/users', authenticateToken, (req, res) => {
   res.json(users);
 });
 
-// Endpoint para actualizar un usuario
-app.put('/users/:dpi', (req, res) => {
-  const { dpi } = req.params;
-  const { name, email, password, newDpi } = req.body;
+app.put('/users/:id', authenticateToken, (req, res) => {
+  const { id } = req.params;
+  const userIndex = users.findIndex(u => u.id == id);
 
-  const userIndex = users.findIndex(user => user.dpi === dpi);
   if (userIndex === -1) {
     return res.status(404).json({ message: 'Usuario no encontrado' });
   }
 
-  // Validar que el nuevo DPI no esté ya en uso si se va a cambiar
-  if (newDpi && users.some(user => user.dpi === newDpi)) {
-    return res.status(400).json({ message: 'El nuevo DPI ya está registrado' });
-  }
-
-  // Actualizar datos
-  users[userIndex] = { ...users[userIndex], name, email, password, dpi: newDpi || dpi };
+  users[userIndex] = { ...users[userIndex], ...req.body };
   res.json(users[userIndex]);
 });
 
-// Endpoint para eliminar un usuario
-app.delete('/users/:dpi', (req, res) => {
-  const { dpi } = req.params;
+app.delete('/users/:id', authenticateToken, (req, res) => {
+  const { id } = req.params;
+  const userIndex = users.findIndex(u => u.id == id);
 
-  const userIndex = users.findIndex(user => user.dpi === dpi);
   if (userIndex === -1) {
     return res.status(404).json({ message: 'Usuario no encontrado' });
   }
 
   users.splice(userIndex, 1);
-  res.status(204).send();
+  res.json({ message: 'Usuario eliminado' });
 });
 
-const PORT = process.env.PORT || 3000;  // Usará el puerto de Render o el 3000 localmente
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`API escuchando en el puerto ${PORT}`);
+  console.log(`Servidor escuchando en el puerto ${PORT}`);
 });

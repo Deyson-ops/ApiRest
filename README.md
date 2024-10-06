@@ -1,14 +1,100 @@
 # Gestión de Usuarios API
 
-Esta es una API RESTful para gestionar usuarios, desarrollada con Node.js y Express.
+Esta es una API RESTful para gestionar usuarios, desarrollada con Node.js, Express y autenticación mediante JSON Web Tokens (JWT).
 
-La API está desplegada en Render y puedes acceder a ella mediante la siguiente URL:<br>
-https://apirest-7mr1.onrender.com
+La API está desplegada en Render y puedes acceder a ella mediante la siguiente URL:  
+**[https://apirest-jwt.onrender.com](https://apirest-jwt.onrender.com)**
+
+## Descripción
+
+Esta API permite la gestión de usuarios con funcionalidades de login, creación, actualización y eliminación de usuarios. Además, los endpoints sensibles están protegidos mediante JWT para garantizar que solo los usuarios autenticados puedan acceder a ellos.
+
+## Instrucciones para ejecutar la API localmente
+
+### Clonar el repositorio:
+
+```bash
+git clone https://github.com/Deyson-ops/ApiRest.git
+```
+
+### Instalar las dependencias:
+
+```bash
+npm install
+```
+
+### Crear un archivo `.env`:
+
+Dentro del directorio raíz del proyecto, crea un archivo llamado `.env` con las siguientes variables:
+
+```
+JWT_SECRET=#ConejoV3loz.1
+JWT_EXPIRATION=30s
+PORT=3000
+```
+
+### Ejecutar la API:
+
+```bash
+npm start
+```
+
+### URL de la API local:
+
+```
+http://localhost:3000
+```
 
 ## Endpoints
-Pruebas de API realizadas con Postman.
 
-### Crear un usuario
+### 1. **Login**
+
+Genera un token JWT válido por 30 segundos.
+
+- **URL**: `/login`
+- **Método**: `POST`
+- **Cuerpo de la solicitud**:
+  ```json
+  {
+    "email": "user1@example.com",
+    "password": "password1"
+  }
+  ```
+- **Respuesta**:
+  ```json
+  {
+    "token": "jwt_token_generado"
+  }
+  ```
+
+---
+
+### 2. **Listar Usuarios** (Protegido por JWT)
+
+Obtiene una lista de todos los usuarios registrados.
+
+- **URL**: `/users`
+- **Método**: `GET`
+- **Headers**:  
+  `Authorization: Bearer jwt_token_generado`
+
+- **Respuesta**:
+  ```json
+  [
+    {
+      "dpi": "123456789",
+      "name": "Deyson Donado",
+      "email": "dey@gmail.com"
+    },
+    ...
+  ]
+  ```
+
+---
+
+### 3. **Crear un Usuario**
+
+Crea un nuevo usuario.
 
 - **URL**: `/users`
 - **Método**: `POST`
@@ -21,49 +107,116 @@ Pruebas de API realizadas con Postman.
     "password": "password"
   }
   ```
-Respuestas:<br>
-201 Created: Usuario creado correctamente.<br>
-400 Bad Request: El DPI ya está registrado.
+- **Respuestas**:
+  - `201 Created`: Usuario creado correctamente.
+  - `400 Bad Request`: El DPI o email ya está registrado.
 
-### Listar usuarios
-- **URL**: `/users`
-- **Método**: `GET`
+---
 
-Respuestas:<br>
-200 OK: Devuelve un arreglo de usuarios.
+### 4. **Actualizar un Usuario** (Protegido por JWT)
 
-Ejemplo de respuesta:
+Actualiza los datos de un usuario existente por su DPI.
+
+- **URL**: `/users/:dpi`
+- **Método**: `PUT`
+- **Headers**:  
+  `Authorization: Bearer jwt_token_generado`
+- **Cuerpo de la solicitud**:
+  ```json
+  {
+    "name": "Deyson López",
+    "email": "deyl@gmail.com",
+    "password": "password2"
+  }
+  ```
+- **Respuestas**:
+  - `200 OK`: Usuario actualizado correctamente.
+  - `404 Not Found`: Usuario no encontrado.
+
+---
+
+### 5. **Eliminar un Usuario** (Protegido por JWT)
+
+Elimina un usuario existente por su DPI.
+
+- **URL**: `/users/:dpi`
+- **Método**: `DELETE`
+- **Headers**:  
+  `Authorization: Bearer jwt_token_generado`
+- **Respuestas**:
+  - `204 No Content`: Usuario eliminado correctamente.
+  - `404 Not Found`: Usuario no encontrado.
+
+---
+
+## Ejemplos de Solicitudes
+
+### 1. **POST** `/login`:
+
+```json
+{
+  "email": "user1@example.com",
+  "password": "password1"
+}
+```
+
+**Respuesta**:
+```json
+{
+  "token": "jwt_token_generado"
+}
+```
+
+---
+
+### 2. **GET** `/users` (Autenticado):
+
+Headers:  
+`Authorization: Bearer jwt_token_generado`
+
+**Respuesta**:
 ```json
 [
   {
     "dpi": "123456789",
     "name": "Deyson Donado",
-    "email": "dey@gmail.com",
-    "password": "password"
-  },
-  ...
+    "email": "dey@gmail.com"
+  }
 ]
 ```
-### Actualizar un usuario
-- **URL**: `/users/:dpi`
-- **Método**: `PUT`
-- **Cuerpo de la solicitud**:
+
+---
+
+### 3. **PUT** `/users/123456789` (Autenticado):
+
+Headers:  
+`Authorization: Bearer jwt_token_generado`
+
 ```json
 {
-    "name": "Deyson López",
-    "email": "deyl@gmail.com",
-    "password": "password2"
+  "name": "Deyson López",
+  "email": "deyl@gmail.com",
+  "password": "password2"
 }
 ```
-Respuestas:<br>
-200 OK: Usuario actualizado correctamente. <br>
-400 Bad Request: El nuevo DPI ya está registrado.<br>
-404 Not Found: Usuario no encontrado.
 
-### Eliminar un usuario
-- **URL**: `/users/:dpi`
-- **Método**: `DELETE`
+**Respuesta**:
+```json
+{
+  "dpi": "123456789",
+  "name": "Deyson López",
+  "email": "deyl@gmail.com"
+}
+```
 
-Respuestas:<br>
-204 No Content: Usuario eliminado correctamente.<br>
-404 Not Found: Usuario no encontrado.
+---
+
+### 4. **DELETE** `/users/123456789` (Autenticado):
+
+Headers:  
+`Authorization: Bearer jwt_token_generado`
+
+**Respuesta**:
+`204 No Content`
+
+---
