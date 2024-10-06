@@ -77,8 +77,8 @@ Genera un token JWT válido por 90 segundos.
 - **Cuerpo de la solicitud**:
   ```json
   {
-    "email": "user1@example.com",
-    "password": "password1"
+    "email": "dey@gmail.com",
+    "password": "password"
   }
   ```
 - **Respuesta**:
@@ -155,7 +155,7 @@ Elimina un usuario existente por su DPI.
 
 ```json
 {
-  "email": "user1@example.com",
+  "email": "dey@gmail.com"
   "password": "password1"
 }
 ```
