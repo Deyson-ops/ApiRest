@@ -10,16 +10,22 @@ const users = []; // Almacenará los usuarios
 app.post('/users', (req, res) => {
   const { dpi, name, email, password } = req.body;
 
+  // Validar que todos los campos estén presentes
+  if (!dpi || !name || !email || !password) {
+    return res.status(400).json({ message: 'Todos los campos son requeridos' });
+  }
+
   // Validar que el DPI no exista
   const userExists = users.some(user => user.dpi === dpi);
   if (userExists) {
     return res.status(400).json({ message: 'El DPI ya está registrado' });
   }
 
-  const newUser = { dpi, name, email, password };
+  const newUser = { dpi, name, email, password }; // Aquí la contraseña se guarda sin encriptar
   users.push(newUser);
-  res.status(201).json(newUser);
+  res.status(201).json({ message: 'Usuario creado exitosamente', user: newUser });
 });
+
 
 // Endpoint para listar todos los usuarios (Protegido por JWT)
 app.get('/users', authenticateToken, (req, res) => {
