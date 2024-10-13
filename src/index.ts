@@ -112,9 +112,13 @@ app.put('/users/:dpi', authenticateToken, async (req: RequestWithUser, res: Resp
 
   users[userIndex] = updatedUser;
 
-  // Responder con el usuario actualizado
-  res.status(200).json(updatedUser);
+  // Responder con el mensaje de éxito y el usuario actualizado
+  res.status(200).json({
+    message: 'Usuario actualizado correctamente',
+    user: updatedUser
+  });
 });
+
 
 // Endpoint para eliminar un usuario
 app.delete('/users/:dpi', authenticateToken, async (req: RequestWithUser, res: Response): Promise<void> => {
