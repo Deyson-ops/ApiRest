@@ -217,6 +217,10 @@ Headers:
 `Authorization: Bearer jwt_token_generado`
 
 **Respuesta**:
-`204 No Content`
+```json
+{
+    "message": "Usuario con DPI 123456789 eliminado exitosamente"
+}
+```
 
 ---
